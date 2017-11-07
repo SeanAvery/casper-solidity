@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.15;
 
 contract Casper {
     /*
@@ -20,7 +20,7 @@ contract Casper {
     struct Vote {
       uint256 currentDynastyVotes;
       uint256 prevDynastyVotes;
-      mapping(uint256 => mapping(address => bool));
+      mapping(bytes32 => mapping(uint256 => bool)) votBitMap;
       bool isJustified;
       bool isFinalized;
     }
@@ -29,7 +29,7 @@ contract Casper {
       STATE
     */
     /* VALIDATORS */
-    mapping(uint256 => Validator) public Validators;
+    mapping(uint256 => Validator) public validators;
     mapping(address => uint256) public validatorIndexes;
     uint256 validatorIndex;
 
@@ -43,7 +43,7 @@ contract Casper {
 
     /* EPOCHS */
     uint256 public currentEpoch;
-    uint256 public computedCurrentEpoch
+    uint256 public computedCurrentEpoch;
     uint256 public epochLength;
 
     /*
@@ -51,7 +51,7 @@ contract Casper {
     */
     function Casper(
         uint256 _epochLength,
-        uint256 _withdrawDelay,
+        uint256 _withdrawDelay
         ) {
         epochLength = _epochLength;
         withdrawDelay = _withdrawDelay;
@@ -66,21 +66,21 @@ contract Casper {
     */
     function initializeEpoch() returns (bool) {
         computedCurrentEpoch = block.number / epochLength;
-        require(computedCurrentEpoch = currentEpoch + 1);
+        computedCurrentEpoch = currentEpoch + 1;
         currentEpoch = computedCurrentEpoch;
         return true;
     }
 
     function deposit(address _validator, address _withdraw) payable returns (bool) {
-        assert(currentEpoch = block.number/epochLength);
+        currentEpoch = block.number/epochLength;
         Validator memory v;
         v.deposit = 10;
         v.dynastyStart = dynasty;
         v.dynastyEnd = 2**255;
         v.adrs = _validator;
-        v.wiwthdrawAddress = _withdraw;
+        v.withdrawAddress = _withdraw;
         v.prevCommitEpoch = 0;
-        validators.push(v);
+        validators[validatorIndex] = v;
         return true;
     }
 
